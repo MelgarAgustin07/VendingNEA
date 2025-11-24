@@ -1,0 +1,86 @@
+﻿@model VendingNEA_0.Models.Acuerdo
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Acuerdo</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* Fechas *@
+            <div class="form-group">
+                <label asp-for="FechaInicio" class="control-label"></label>
+                <input asp-for="FechaInicio" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FechaFinalizacion" class="control-label"></label>
+                <input asp-for="FechaFinalizacion" class="form-control" />
+                <span asp-validation-for="FechaFinalizacion" class="text-danger"></span>
+            </div>
+
+            @* Máquina *@
+            <div class="form-group">
+                <label asp-for="NumSerie" class="control-label"></label>
+
+                @if (ViewData["IsFixedMachine"] != null && (bool)ViewData["IsFixedMachine"])
+                {
+                    <select asp-for="NumSerie" class="form-control" asp-items="ViewBag.NumSerie" disabled></select>
+                    <input type="hidden" asp-for="NumSerie" />
+                }
+                else
+                {
+                    <select asp-for="NumSerie" class="form-control" asp-items="ViewBag.NumSerie"></select>
+                }
+            </div>
+
+            @* Establecimiento *@
+            <div class="form-group">
+                <label asp-for="Cuit" class="control-label"></label>
+                <select asp-for="Cuit" class="form-control" asp-items="ViewBag.Cuit"></select>
+            </div>
+
+            @* 🔥 Condiciones comerciales *@
+            @if (ViewBag.Condiciones != null)
+            {
+                <div class="form-group mt-3">
+                    <label>Condiciones comerciales</label>
+                    @foreach (var cond in (IEnumerable<VendingNEA_0.Models.Condicion>)ViewBag.Condiciones)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="CondicionesSeleccionadas"
+                                   value="@cond.CodCondicion" />
+                            <label class="form-check-label">
+                                @cond.Nombre
+                            </label>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

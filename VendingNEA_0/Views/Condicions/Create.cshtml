@@ -1,0 +1,80 @@
+﻿@model VendingNEA_0.Models.Condicion
+
+@{
+    ViewData["Title"] = "Crear Condición";
+    var numAcuerdo = ViewBag.NumAcuerdo;   // viene desde Acuerdos/Create
+}
+
+<h1>Crear Condición</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <!-- acuerdo al que pertenece -->
+            <input type="hidden" name="NumAcuerdo" value="@numAcuerdo" />
+
+            <!-- resumen de errores -->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label>Nombre de la condición</label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Tipo de condición</label>
+                <select id="tipoCondicion" name="TipoCondicion" class="form-control">
+                    <option value="">Seleccione...</option>
+                    <option value="comision">Porcentaje (Comisión)</option>
+                    <option value="monto">Monto Fijo</option>
+                </select>
+            </div>
+
+            <!-- Porcentaje -->
+            <div class="form-group mt-3" id="divPorcentaje" style="display:none;">
+                <label>Porcentaje (%)</label>
+                <input type="number"
+                       name="Porcentaje"
+                       step="1"
+                       min="0"
+                       max="100"
+                       class="form-control" />
+            </div>
+
+            <!-- Monto -->
+            <div class="form-group mt-3" id="divMonto" style="display:none;">
+                <label>Monto ($)</label>
+                <input type="number"
+                       name="Monto"
+                       step="0.01"
+                       min="0"
+                       class="form-control" />
+            </div>
+
+            <div class="mt-4">
+                <input type="submit" value="Guardar condición" class="btn btn-primary" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const sel = document.getElementById("tipoCondicion");
+        const divP = document.getElementById("divPorcentaje");
+        const divM = document.getElementById("divMonto");
+
+        sel.addEventListener("change", function () {
+            divP.style.display = (this.value === "comision") ? "block" : "none";
+            divM.style.display = (this.value === "monto") ? "block" : "none";
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

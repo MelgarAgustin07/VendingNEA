@@ -1,0 +1,53 @@
+﻿@model IEnumerable<VendingNEA_0.Models.Acuerdo>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaInicio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaFinalizacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CuitNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumSerieNavigation)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaInicio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaFinalizacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CuitNavigation.Cuit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumSerieNavigation.NumSerie)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.NumAcuerdo">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.NumAcuerdo">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.NumAcuerdo">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

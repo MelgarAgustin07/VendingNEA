@@ -1,0 +1,83 @@
+﻿@model VendingNEA_0.Models.Maquina
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Detalles de Máquina</h1>
+
+<!-- 🔥 Mostrar mensaje si el controlador envió un TempData["Error"] -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<div>
+    <h4>Maquina</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Ubicacion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ubicacion)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Descripcion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Descripcion)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EstadoOperativo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EstadoOperativo)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Marca)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Marca)
+        </dd>
+    </dl>
+</div>
+
+<hr />
+
+<h3>Acuerdo vigente</h3>
+
+@if (ViewBag.AcuerdoVigente != null)
+{
+    <div class="card p-3" style="max-width: 500px;">
+        <p><strong>Establecimiento:</strong> @ViewBag.AcuerdoVigente.CuitNavigation.NombreComercial</p>
+        <p><strong>Fecha inicio:</strong> @ViewBag.AcuerdoVigente.FechaInicio.ToShortDateString()</p>
+        <p><strong>Fecha fin:</strong> @ViewBag.AcuerdoVigente.FechaFinalizacion.ToShortDateString()</p>
+    </div>
+}
+else
+{
+    <p>No tiene un acuerdo vigente.</p>
+}
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model?.NumSerie">Edit</a> |
+    <a asp-action="Index">Back to List</a> |
+
+    <!-- 🔥 Mostrar botón solo si NO hay acuerdo vigente -->
+    @if (ViewBag.AcuerdoVigente == null)
+    {
+        <a asp-controller="Acuerdos" asp-action="Create" asp-route-numSerie="@Model.NumSerie">
+            Asignar Acuerdo
+        </a>
+    }
+    else
+    {
+        <span class="text-muted">(Ya tiene un acuerdo vigente)</span>
+    }
+</div>
