@@ -1,0 +1,85 @@
+﻿@model IEnumerable<VendingNEA_0.Models.Mantenimiento>
+
+@{
+    ViewData["Title"] = "Mantenimiento Técnico de Máquinas";
+}
+
+<h1 class="text-center mt-4">Mantenimiento Técnico de Máquinas</h1>
+<hr />
+
+<!-- Botón Dar de Alta -->
+<div class="row mb-3">
+    <div class="col text-end">
+        <a class="btn btn-success" asp-action="Create">
+            <i class="bi bi-plus-circle me-2"></i> Dar de Alta
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<form method="get" class="row g-3 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label for="estadoFiltro" class="form-label">Estado</label>
+        <select class="form-select" id="estadoFiltro" name="estadoFiltro" asp-items="ViewBag.EstadoList"></select>
+    </div>
+    <div class="col-md-3">
+        <label for="tipoFiltro" class="form-label">Tipo</label>
+        <select class="form-select" id="tipoFiltro" name="tipoFiltro" asp-items="ViewBag.TipoList"></select>
+    </div>
+    <div class="col-md-2">
+        <label for="fechaInicio" class="form-label">Desde</label>
+        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="@ViewBag.FechaInicio">
+    </div>
+    <div class="col-md-2">
+        <label for="fechaFin" class="form-label">Hasta</label>
+        <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="@ViewBag.FechaFin">
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search me-2"></i>Filtrar
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-brush me-2"></i>Limpiar
+        </a>
+    </div>
+</form>
+
+<!-- Tabla de mantenimientos -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Tipo</th>
+            <th>Costo</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Descripción</th>
+            <th>Máquina(N° Serie)</th>
+            <th>Responsable</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Model)
+        {
+            var estado = (m.Fecha.HasValue && m.Fecha.Value.Date <= DateTime.Today)
+            ? "Realizado"
+            : "Programado";
+            var estadoBadge = estado == "Realizado" ? "badge bg-success" : "badge bg-primary";
+
+            var tipoBadge = m.Tipo?.ToLower() == "preventivo" ? "badge bg-primary" :
+            m.Tipo?.ToLower() == "correctivo" ? "badge bg-danger" :
+            "badge bg-secondary";
+
+            <tr>
+                <td>@m.CodMantenimiento</td>
+                <td><span class="@tipoBadge">@m.Tipo</span></td>
+                <td>$@m.Costo?.ToString("F2")</td>
+                <td>@m.Fecha?.ToString("dd/MM/yyyy")</td>
+                <td><span class="@estadoBadge">@estado</span></td>
+                <td>@m.Descripcion</td>
+                <td>@m.NumSerieMaquinaNavigation.NumSerie</td>
+                <td>@m.LegajoTecnicoNavigation.LegajoNavigation.Nombre @m.LegajoTecnicoNavigation.LegajoNavigation.Apellido</td>
+            </tr>
+        }
+    </tbody>
+</table>

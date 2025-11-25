@@ -1,0 +1,78 @@
+﻿@model VendingNEA_0.Models.Mantenimiento
+
+<h1 class="text-center mt-4">Alta de Mantenimiento de Máquina</h1>
+<hr />
+
+<div class="d-flex justify-content-center mb-4">
+    <a class="btn btn-secondary" asp-action="Index">
+        <i class="bi bi-arrow-left me-2"></i> Volver al Listado
+    </a>
+</div>
+
+<div class="d-flex justify-content-center">
+    <div class="card col-12 col-md-8 col-lg-6">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-3">
+                    <!-- Tipo -->
+                    <div class="col-md-6">
+                        <label asp-for="Tipo" class="form-label fw-bold"></label>
+                        <select asp-for="Tipo" class="form-select" required>
+                            <option value="">-- Seleccionar --</option>
+                            <option value="Preventivo">Preventivo</option>
+                            <option value="Correctivo">Correctivo</option>
+                        </select>
+                        <span asp-validation-for="Tipo" class="text-danger"></span>
+                    </div>
+
+                    <!-- Costo -->
+                    <div class="col-md-6">
+                        <label asp-for="Costo" class="form-label fw-bold"></label>
+                        <input asp-for="Costo" class="form-control" type="number" step="0.01" required />
+                        <span asp-validation-for="Costo" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="col-md-6">
+                        <label asp-for="Fecha" class="form-label fw-bold"></label>
+                        <input asp-for="Fecha" class="form-control" type="date" required />
+                        <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="col-md-6">
+                        <label asp-for="Descripcion" class="form-label fw-bold"></label>
+                        <input asp-for="Descripcion" class="form-control" required />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Técnico -->
+                    <div class="col-md-6">
+                        <label asp-for="LegajoTecnico" class="form-label fw-bold">Técnico</label>
+                        <select asp-for="LegajoTecnico" class="form-select" asp-items="ViewBag.Tecnicos" required>
+                            <option value="">-- Seleccionar Técnico --</option>
+                        </select>
+                        <span asp-validation-for="LegajoTecnico" class="text-danger"></span>
+                    </div>
+
+                    <!-- Máquina -->
+                    <div class="col-md-6">
+                        <label asp-for="NumSerieMaquina" class="form-label fw-bold">Máquina</label>
+                        <select asp-for="NumSerieMaquina" class="form-select" asp-items="ViewBag.Maquinas" required>
+                            <option value="">-- Seleccionar Máquina --</option>
+                        </select>
+                        <span asp-validation-for="NumSerieMaquina" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-plus-circle me-2"></i> Crear Mantenimiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

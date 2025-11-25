@@ -21,7 +21,7 @@ public partial class Mantenimiento
 
     public virtual ICollection<Incidente> Incidentes { get; set; } = new List<Incidente>();
 
-    public virtual EmpleadoTecnico LegajoTecnicoNavigation { get; set; } = null!;
+    public virtual EmpleadoTecnico? LegajoTecnicoNavigation { get; set; } = null!;
 
-    public virtual Maquina NumSerieMaquinaNavigation { get; set; } = null!;
+    public virtual Maquina? NumSerieMaquinaNavigation { get; set; } = null!;
 }
