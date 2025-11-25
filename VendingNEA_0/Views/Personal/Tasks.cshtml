@@ -17,7 +17,7 @@
 @if (!Model.Rutas.Any() && !Model.Visitas.Any() && !Model.Mantenimientos.Any())
 {
     <div class="d-flex justify-content-center">
-        <div class="card p-4 col-10 col-md-6 text-center">
+        <div class="card p-4 col-12 col-md-8 text-center">
             <h4>No se encontraron tareas realizadas por este empleado.</h4>
         </div>
     </div>
@@ -29,57 +29,65 @@
     <!-- Mostrar RUTAS solo si hay -->
     @if (Model.Rutas.Any())
     {
-        <h3 class="text-center mb-3">Rutas</h3>
-        @foreach (var ruta in Model.Rutas)
-        {
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Ruta #@ruta.CodRuta</h4>
-                </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <h3 class="text-center mb-3">Rutas</h3>
+                @foreach (var ruta in Model.Rutas)
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Ruta #@ruta.CodRuta</h4>
+                        </div>
 
-                <div class="card-body">
-                    <p><strong>Fecha:</strong> @ruta.Fecha?.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Patente de Vehículo:</strong> @ruta.PatenteVehiculo</p>
+                        <div class="card-body">
+                            <p><strong>Fecha:</strong> @ruta.Fecha?.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Patente de Vehículo:</strong> @ruta.PatenteVehiculo</p>
 
-                    @if (ruta.Visita.Any())
-                    {
-                        <hr/>
-                        <h6>Visitas en esta ruta:</h6>
-                        <ul>
-                            @foreach (var v in ruta.Visita)
+                            @if (ruta.Visita.Any())
                             {
-                                <li>
-                                    Visita a máquina @v.NumSerieMaquina -
-                                    @v.Fecha?.ToString("dd/MM/yyyy")
-                                    (@v.HoraInicio?.ToString("HH:mm") - @v.HoraFinalizacion?.ToString("HH:mm"))
-                                </li>
+                                <hr />
+                                <h6>Visitas en esta ruta:</h6>
+                                <ul>
+                                    @foreach (var v in ruta.Visita)
+                                    {
+                                        <li>
+                                            Visita a máquina @v.NumSerieMaquina -
+                                            @v.Fecha?.ToString("dd/MM/yyyy")
+                                            (@v.HoraInicio?.ToString("HH:mm") - @v.HoraFinalizacion?.ToString("HH:mm"))
+                                        </li>
+                                    }
+                                </ul>
                             }
-                        </ul>
-                    }
-                </div>
+                        </div>
+                    </div>
+                }
             </div>
-        }
+        </div>
     }
 
     <!-- Mostrar VISITAS independientes solo si hay -->
     @if (Model.Visitas.Any())
     {
-        <h3 class="text-center mb-3">Visitas Independientes</h3>
-        @foreach (var visita in Model.Visitas)
-        {
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Visita #@visita.CodVisita</h4>
-                </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <h3 class="text-center mb-3">Visitas Independientes</h3>
+                @foreach (var visita in Model.Visitas)
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Visita #@visita.CodVisita</h4>
+                        </div>
 
-                <div class="card-body">
-                    <p><strong>N° de Serie de Máquina:</strong> @visita.NumSerieMaquina</p>
-                    <p><strong>Fecha:</strong> @visita.Fecha?.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Duración de la visita:</strong> @visita.HoraInicio?.ToString("HH:mm") - @visita.HoraFinalizacion?.ToString("HH:mm")</p>
-                    <p><strong>Observaciones:</strong> @visita.Observaciones</p>
-                </div>
+                        <div class="card-body">
+                            <p><strong>N° de Serie de Máquina:</strong> @visita.NumSerieMaquina</p>
+                            <p><strong>Fecha:</strong> @visita.Fecha?.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Duración de la visita:</strong> @visita.HoraInicio?.ToString("HH:mm") - @visita.HoraFinalizacion?.ToString("HH:mm")</p>
+                            <p><strong>Observaciones:</strong> @visita.Observaciones</p>
+                        </div>
+                    </div>
+                }
             </div>
-        }
+        </div>
     }
 }
 
@@ -88,22 +96,26 @@
 {
     @if (Model.Mantenimientos.Any())
     {
-        <h3 class="text-center mb-3">Mantenimientos</h3>
-        @foreach (var m in Model.Mantenimientos)
-        {
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Mantenimiento @m.CodMantenimiento</h4>
-                </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <h3 class="text-center mb-3">Mantenimientos</h3>
+                @foreach (var m in Model.Mantenimientos)
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Mantenimiento @m.CodMantenimiento</h4>
+                        </div>
 
-                <div class="card-body">
-                    <p><strong>N° de Serie de Máquina:</strong> @m.NumSerieMaquina</p>
-                    <p><strong>Tipo de Mantenimiento:</strong> @m.Tipo</p>
-                    <p><strong>Fecha:</strong> @m.Fecha?.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Costo:</strong> $@m.Costo?.ToString("F2")</p>
-                    <p><strong>Descripción:</strong> @m.Descripcion</p>
-                </div>
+                        <div class="card-body">
+                            <p><strong>N° de Serie de Máquina:</strong> @m.NumSerieMaquina</p>
+                            <p><strong>Tipo de Mantenimiento:</strong> @m.Tipo</p>
+                            <p><strong>Fecha:</strong> @m.Fecha?.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Costo:</strong> $@m.Costo?.ToString("F2")</p>
+                            <p><strong>Descripción:</strong> @m.Descripcion</p>
+                        </div>
+                    </div>
+                }
             </div>
-        }
+        </div>
     }
 }
