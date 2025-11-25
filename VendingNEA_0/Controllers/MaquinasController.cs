@@ -34,6 +34,8 @@ namespace VendingNEA_0.Controllers
 
             // Buscamos la máquina
             var maquina = await _context.Maquinas
+                 .Include(m => m.MaquinaDebito)
+                 .Include(m => m.MaquinaEfectivo)
                 .FirstOrDefaultAsync(m => m.NumSerie == id);
 
             if (maquina == null)
@@ -129,38 +131,20 @@ namespace VendingNEA_0.Controllers
             return View(maquina);
         }
 
-        // GET: Maquinas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var maquina = await _context.Maquinas
-                .FirstOrDefaultAsync(m => m.NumSerie == id);
-            if (maquina == null)
-            {
-                return NotFound();
-            }
-
-            return View(maquina);
-        }
-
-        // POST: Maquinas/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
         {
             var maquina = await _context.Maquinas.FindAsync(id);
-            if (maquina != null)
-            {
-                _context.Maquinas.Remove(maquina);
-            }
 
+            if (maquina == null)
+                return NotFound();
+
+            _context.Maquinas.Remove(maquina);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Ok();
         }
+
 
         private bool MaquinaExists(int id)
         {

@@ -8,43 +8,154 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VendingNEA_0.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        #sidebar {
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+            #sidebar.collapsed {
+                margin-left: -380px;
+            }
+
+        #content {
+            width: 100%;
+            margin-left: 380px;
+            transition: margin-left 0.3s;
+        }
+
+            #content.expanded {
+                margin-left: 0;
+            }
+
+        .sidebar-heading {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VendingNEA_0</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - VendingNEA_0 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" id="sidebar" style="width: 380px;">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <i class="bi bi-shop fs-4 me-2"></i>
+                <span class="fs-4">VendingNEA</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a asp-area="" asp-controller="Maquinas" asp-action="Index" class="nav-link active" aria-current="page">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Gestión de Máquinas Expendedoras
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-person-badge me-2"></i>
+                        Gestión del Personal
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-building me-2"></i>
+                        Gestión de Acuerdos Comerciales
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-tools me-2"></i>
+                        Mantenimiento Técnico de Máquinas
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Registro y Gestión de Incidentes
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-cart-check me-2"></i>
+                        Consulta de Ventas
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" class="nav-link text-white">
+                        <i class="bi bi-map me-2"></i>
+                        Gestión de Rutas y Visitas
+                    </a>
+                </li>
+            </ul>
         </div>
-    </footer>
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Top Navigation Bar -->
+            <div class="container-fluid mt-3">
+                <button class="btn btn-dark" id="sidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+            <!-- Main Content -->
+            <div class="container-fluid p-4">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+            <!-- Footer -->
+            <footer class="border-top footer text-muted mt-auto">
+                <div class="container-fluid p-3">
+                    &copy; 2025 - VendingNEA_0
+                </div>
+            </footer>
+        </div>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Manejar el toggle del sidebar
+        document.getElementById("sidebarToggle").addEventListener("click", function(e) {
+            e.preventDefault();
+            var sidebar = document.getElementById("sidebar");
+            var content = document.getElementById("content");
+
+            sidebar.classList.toggle("collapsed");
+            content.classList.toggle("expanded");
+        });
+
+        // Función para manejar el comportamiento responsive
+        function handleResponsive() {
+            var sidebar = document.getElementById("sidebar");
+            var content = document.getElementById("content");
+            var windowWidth = window.innerWidth;
+
+            if (windowWidth <= 768) {
+                // En móvil, sidebar colapsado por defecto
+                sidebar.classList.add("collapsed");
+                content.classList.add("expanded");
+            } else {
+                // En desktop, sidebar visible por defecto
+                sidebar.classList.remove("collapsed");
+                content.classList.remove("expanded");
+            }
+        }
+
+        // Ejecutar al cargar la página
+        handleResponsive();
+
+        // Ejecutar al cambiar el tamaño de la ventana
+        window.addEventListener("resize", handleResponsive);
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

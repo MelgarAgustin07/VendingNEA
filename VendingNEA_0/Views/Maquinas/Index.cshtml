@@ -4,30 +4,98 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1 class="text-center mt-4">Gestión de Máquinas Expendedoras</h1>
+<hr/>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<div class="d-flex justify-content-end mb-3 mt-3">
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Dar de Alta
+    </a>
+</div>
+<table class="table table-bordered">
     <thead>
         <tr>
-            <th>Descripción</th>
-            <th>Marca</th>
-            <th></th>
+            <th style="background-color: #f3f3f3">N° de Serie</th>
+            <th style="background-color: #f3f3f3">Descripción</th>
+            <th style="background-color: #f3f3f3">Marca</th>
+            <th style="background-color: #f3f3f3">Estado Operativo</th>
+            <th style="background-color: #f3f3f3">Acciones</th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
-            <tr>
-                <td>@item.Descripcion</td>
-                <td>@item.Marca</td>
-                <td>
-                <a asp-action="Edit" asp-route-id="@item.NumSerie">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NumSerie">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NumSerie">Delete</a>
+        <tr>
+            <td>@item.NumSerie</td>
+            <td>@item.Descripcion</td>
+            <td>@item.Marca</td>
+            <td>
+                @if (item.EstadoOperativo.GetValueOrDefault())
+                {
+                    <span class="badge rounded-pill bg-success">Operando</span>
+                }
+                else
+                {
+                    <span class="badge rounded-pill bg-danger">Fuera de servicio</span>
+                }
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.NumSerie" class="btn btn-primary"><i class="bi bi-info-circle me-2"></i>Detalles</a> |
+                <a asp-action="Edit" asp-route-id="@item.NumSerie" class="btn btn-warning"><i class="bi bi-pencil-square me-2"></i>Editar</a> |
+                <button type="button"
+                        class="btn btn-danger"
+                        onclick="confirmarEliminacion(@item.NumSerie, '@item.Descripcion', '@item.Marca', '@(item.EstadoOperativo == true ? "Operando" : "Fuera de Servicio")')">
+                    <i class="bi bi-trash me-2"></i>Eliminar
+                </button>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmarEliminacion(numSerie, descripcion, marca, estado) {
+
+            Swal.fire({
+                title: "¿Eliminar Máquina?",
+                html: `
+                    <div class="text-center">
+                        <strong>N° Serie:</strong> ${numSerie}<br>
+                        <strong>Descripción:</strong> ${descripcion}<br>
+                        <strong>Marca:</strong> ${marca}<br>
+                        <span class="text-danger fw-bold">⚠ Los cambios son irreversibles.</span>
+                    </div>
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Eliminar definitivamente",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    eliminarMaquina(numSerie);
+                }
+            });
+        }
+
+        function eliminarMaquina(numSerie) {
+            fetch(`/Maquinas/Delete/${numSerie}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        title: "Eliminada",
+                        text: "La máquina fue eliminada exitosamente",
+                        icon: "success"
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire("Error", "No se pudo eliminar la máquina", "error");
+                }
+            });
+        }
+    </script>
+}
