@@ -18,10 +18,35 @@ namespace VendingNEA_0.Controllers
             _context = context;
         }
 
-        // GET: Maquinas
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string estadoFiltro, string ubicacionFiltro)
         {
-            return View(await _context.Maquinas.ToListAsync());
+            var maquinas = _context.Maquinas.AsQueryable();
+
+            // Filtrar por estado operativo
+            if (!string.IsNullOrEmpty(estadoFiltro))
+            {
+                bool estado = estadoFiltro == "true";
+                maquinas = maquinas.Where(m => m.EstadoOperativo == estado);
+            }
+
+            // Filtrar por ubicación
+            if (!string.IsNullOrEmpty(ubicacionFiltro))
+            {
+                maquinas = maquinas.Where(m => m.Ubicacion.Contains(ubicacionFiltro));
+            }
+
+            // Crear lista de opciones para el dropdown
+            ViewBag.EstadoList = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Todos", Value = "", Selected = string.IsNullOrEmpty(estadoFiltro) },
+                new SelectListItem { Text = "Operando", Value = "true", Selected = estadoFiltro == "true" },
+                new SelectListItem { Text = "Fuera de Servicio", Value = "false", Selected = estadoFiltro == "false" },
+            };
+
+            ViewBag.UbicacionFiltro = ubicacionFiltro;
+
+            var lista = await maquinas.ToListAsync();
+            return View(lista);
         }
 
         // GET: Maquinas/Details/5

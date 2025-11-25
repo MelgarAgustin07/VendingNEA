@@ -7,19 +7,41 @@
 <h1 class="text-center mt-4">Gestión de Máquinas Expendedoras</h1>
 <hr/>
 
-<div class="d-flex justify-content-end mb-3 mt-3">
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Dar de Alta
-    </a>
-</div>
+<!-- Filtros -->
+<form method="get" class="row g-3 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label for="estadoFiltro" class="form-label">Estado Operativo</label>
+        <select class="form-select" id="estadoFiltro" name="estadoFiltro" asp-items="ViewBag.EstadoList">
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="ubicacionFiltro" class="form-label">Ubicación</label>
+        <input type="text" class="form-control" id="ubicacionFiltro" name="ubicacionFiltro" value="@(ViewBag.UbicacionFiltro ?? "")" placeholder="Ingrese ubicación">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search me-2"></i>Filtrar
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-brush me-2"></i>Limpiar
+        </a>
+    </div>
+    <div class="col-md-3 text-end">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i> Dar de Alta
+        </a>
+    </div>
+</form>
+
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th style="background-color: #f3f3f3">N° de Serie</th>
-            <th style="background-color: #f3f3f3">Descripción</th>
-            <th style="background-color: #f3f3f3">Marca</th>
-            <th style="background-color: #f3f3f3">Estado Operativo</th>
-            <th style="background-color: #f3f3f3">Acciones</th>
+            <th>N° de Serie</th>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Estado Operativo</th>
+            <th>Ubicación</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -38,11 +60,12 @@
                     <span class="badge rounded-pill bg-danger">Fuera de servicio</span>
                 }
             </td>
+            <td>@item.Ubicacion</td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.NumSerie" class="btn btn-primary"><i class="bi bi-info-circle me-2"></i>Detalles</a> |
-                <a asp-action="Edit" asp-route-id="@item.NumSerie" class="btn btn-warning"><i class="bi bi-pencil-square me-2"></i>Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.NumSerie" class="btn btn-primary m-1"><i class="bi bi-info-circle me-2"></i>Detalles</a>
+                <a asp-action="Edit" asp-route-id="@item.NumSerie" class="btn btn-warning m-1"><i class="bi bi-pencil-square me-2"></i>Editar</a>   
                 <button type="button"
-                        class="btn btn-danger"
+                        class="btn btn-danger m-1"
                         onclick="confirmarEliminacion(@item.NumSerie, '@item.Descripcion', '@item.Marca', '@(item.EstadoOperativo == true ? "Operando" : "Fuera de Servicio")')">
                     <i class="bi bi-trash me-2"></i>Eliminar
                 </button>
