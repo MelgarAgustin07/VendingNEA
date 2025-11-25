@@ -209,7 +209,7 @@ public partial class VendingContext : DbContext
 
             entity.ToTable("Empleado");
 
-            entity.Property(e => e.Legajo).ValueGeneratedNever();
+            entity.Property(e => e.Legajo).ValueGeneratedOnAdd();
             entity.Property(e => e.Apellido).HasMaxLength(100);
             entity.Property(e => e.Direccion).HasMaxLength(100);
             entity.Property(e => e.Dni).HasColumnName("DNI");

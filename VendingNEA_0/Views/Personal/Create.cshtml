@@ -1,0 +1,133 @@
+﻿@model VendingNEA_0.Models.Empleado
+
+@{
+    ViewData["Title"] = "Registro de Empleado";
+}
+
+<h1 class="text-center mt-4">Registro de Empleado</h1>
+<hr />
+
+<div class="d-flex justify-content-center mb-4">
+    <a class="btn btn-secondary" asp-action="Index">
+        <i class="bi bi-arrow-left me-2"></i> Volver al Listado
+    </a>
+</div>
+
+<div class="d-flex justify-content-center">
+    <div class="card col-12 col-md-8 col-lg-6">
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-3">
+                    <!-- DNI -->
+                    <div class="col-md-6">
+                        <label asp-for="Dni" class="form-label fw-bold"></label>
+                        <input asp-for="Dni" class="form-control" required />
+                        <span asp-validation-for="Dni" class="text-danger"></span>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="col-md-6">
+                        <label asp-for="Nombre" class="form-label fw-bold"></label>
+                        <input asp-for="Nombre" class="form-control" required />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="col-md-6">
+                        <label asp-for="Apellido" class="form-label fw-bold"></label>
+                        <input asp-for="Apellido" class="form-control" required />
+                        <span asp-validation-for="Apellido" class="text-danger"></span>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="col-md-6">
+                        <label asp-for="Direccion" class="form-label fw-bold"></label>
+                        <input asp-for="Direccion" class="form-control" required />
+                        <span asp-validation-for="Direccion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-bold"></label>
+                        <input asp-for="Email" class="form-control" type="email" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Puesto -->
+                    <div class="col-md-6">
+                        <label asp-for="Puesto" class="form-label fw-bold">Puesto</label>
+                        <select class="form-control" asp-for="Puesto" id="selectPuesto" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Repositor">Repositor</option>
+                            <option value="Tecnico">Técnico</option>
+                            <option value="Atencion al Cliente">Atención al Cliente</option>
+                            <option value="Administrativo">Administrativo</option>
+                        </select>
+                        <span asp-validation-for="Puesto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Campo extra Repositor -->
+                    <div id="campoRepositor" class="col-md-6" style="display:none;">
+                        <label class="form-label fw-bold">Licencia de Conducir</label>
+                        <input class="form-control" name="LicenciaConducir" id="inputLicencia" />
+                    </div>
+
+                    <!-- Campo extra Técnico -->
+                    <div id="campoTecnico" class="col-md-6" style="display:none;">
+                        <label class="form-label fw-bold">Título</label>
+                        <input class="form-control" name="Titulo" id="inputTitulo" />
+                    </div>
+
+                    <!-- Fecha ingreso -->
+                    <div class="col-md-6">
+                        <label asp-for="FechaIngreso" class="form-label fw-bold"></label>
+                        <input asp-for="FechaIngreso" type="date" class="form-control" required />
+                        <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-plus-circle me-2"></i> Registrar Empleado
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const puesto = document.getElementById("selectPuesto");
+        const campoRepositor = document.getElementById("campoRepositor");
+        const campoTecnico = document.getElementById("campoTecnico");
+        const licencia = document.getElementById("inputLicencia");
+        const titulo = document.getElementById("inputTitulo");
+
+        puesto.addEventListener("change", function () {
+
+            campoRepositor.style.display = "none";
+            campoTecnico.style.display = "none";
+
+            licencia.required = false;
+            titulo.required = false;
+
+            if (this.value === "Repositor") {
+                campoRepositor.style.display = "block";
+                licencia.required = true;
+            }
+
+            if (this.value === "Tecnico") {
+                campoTecnico.style.display = "block";
+                titulo.required = true;
+            }
+        });
+    </script>
+}

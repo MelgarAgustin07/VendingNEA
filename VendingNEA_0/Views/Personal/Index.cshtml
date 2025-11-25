@@ -1,0 +1,45 @@
+﻿@model IEnumerable<VendingNEA_0.Models.Empleado>
+
+@{
+    ViewData["Title"] = "Gestión de Personal";
+}
+
+<h1 class="text-center mt-4">Gestión de Personal</h1>
+<hr/>
+
+<div class="d-flex justify-content-end mb-3 mt-3">
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Registrar Empleado
+    </a>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="background-color: #f3f3f3">N° de Legajo</th>
+            <th style="background-color: #f3f3f3">DNI</th>
+            <th style="background-color: #f3f3f3">Nombre Completo</th>
+            <th style="background-color: #f3f3f3">Direccion</th>
+            <th style="background-color: #f3f3f3">Email</th>
+            <th style="background-color: #f3f3f3">Fecha de Ingreso</th>
+            <th style="background-color: #f3f3f3">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Legajo</td>
+                <td>@item.Dni</td>
+                <td>@item.Nombre @item.Apellido</td>
+                <td>@item.Direccion</td>
+                <td>@item.Email</td>
+                <td>@item.FechaIngreso?.ToString("dd/MM/yyyy")</td>
+                
+                <td>
+                    <a asp-action="Tasks" asp-route-legajo="@item.Legajo" class="btn btn-primary"><i class="bi bi-clipboard-check me-2"></i>Ver Tareas</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
