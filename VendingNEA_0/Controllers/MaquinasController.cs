@@ -20,7 +20,10 @@ namespace VendingNEA_0.Controllers
 
         public async Task<IActionResult> Index(string estadoFiltro, string ubicacionFiltro)
         {
-            var maquinas = _context.Maquinas.AsQueryable();
+            var maquinas = _context.Maquinas
+                .Include(m => m.Acuerdos)
+                .Where(m => !m.IsDeleted)
+                .AsQueryable();
 
             // Filtrar por estado operativo
             if (!string.IsNullOrEmpty(estadoFiltro))
@@ -35,7 +38,6 @@ namespace VendingNEA_0.Controllers
                 maquinas = maquinas.Where(m => m.Ubicacion.Contains(ubicacionFiltro));
             }
 
-            // Crear lista de opciones para el dropdown
             ViewBag.EstadoList = new List<SelectListItem>
             {
                 new SelectListItem { Text = "Todos", Value = "", Selected = string.IsNullOrEmpty(estadoFiltro) },
@@ -53,31 +55,22 @@ namespace VendingNEA_0.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            // Buscamos la máquina
             var maquina = await _context.Maquinas
-                 .Include(m => m.MaquinaDebito)
-                 .Include(m => m.MaquinaEfectivo)
-                .FirstOrDefaultAsync(m => m.NumSerie == id);
+                .Include(m => m.MaquinaDebito)
+                .Include(m => m.MaquinaEfectivo)
+                .FirstOrDefaultAsync(m => m.NumSerie == id && !m.IsDeleted);
 
             if (maquina == null)
-            {
                 return NotFound();
-            }
 
-            // ===============================
-            // BUSCAR ACUERDO VIGENTE
-            // ===================
-            // ============
+            // Buscar acuerdo vigente
             var acuerdoVigente = await _context.Acuerdos
-                .Include(a => a.CuitNavigation) // carga datos del establecimiento
+                .Include(a => a.CuitNavigation)
                 .Where(a => a.NumSerie == id && a.FechaFinalizacion >= DateTime.Now)
                 .FirstOrDefaultAsync();
 
-            // Enviarlo a la vista
             ViewBag.AcuerdoVigente = acuerdoVigente;
 
             return View(maquina);
@@ -90,16 +83,17 @@ namespace VendingNEA_0.Controllers
         }
 
         // POST: Maquinas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("NumSerie,Ubicacion,Descripcion,EstadoOperativo,Marca")] Maquina maquina)
         {
             if (ModelState.IsValid)
             {
+                maquina.IsDeleted = false;
+
                 _context.Add(maquina);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(maquina);
@@ -109,47 +103,42 @@ namespace VendingNEA_0.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var maquina = await _context.Maquinas.FindAsync(id);
+            var maquina = await _context.Maquinas
+                .Where(m => !m.IsDeleted)
+                .FirstOrDefaultAsync(m => m.NumSerie == id);
+
             if (maquina == null)
-            {
                 return NotFound();
-            }
+
             return View(maquina);
         }
 
         // POST: Maquinas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NumSerie,Ubicacion,Descripcion,EstadoOperativo,Marca")] Maquina maquina)
         {
             if (id != maquina.NumSerie)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var original = await _context.Maquinas.AsNoTracking().FirstAsync(m => m.NumSerie == id);
+                    maquina.IsDeleted = original.IsDeleted;
+
                     _context.Update(maquina);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!MaquinaExists(maquina.NumSerie))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -159,17 +148,31 @@ namespace VendingNEA_0.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var maquina = await _context.Maquinas.FindAsync(id);
+            var maquina = await _context.Maquinas
+                .FirstOrDefaultAsync(m => m.NumSerie == id && !m.IsDeleted);
 
             if (maquina == null)
                 return NotFound();
 
-            _context.Maquinas.Remove(maquina);
+            maquina.IsDeleted = true;
+            maquina.EstadoOperativo = false;
+            _context.Maquinas.Update(maquina);
+
+            // Buscar acuerdo vigente
+            var acuerdo = await _context.Acuerdos
+                .Where(a => a.NumSerie == id && a.FechaFinalizacion >= DateTime.Now)
+                .FirstOrDefaultAsync();
+
+            if (acuerdo != null)
+            {
+                acuerdo.FechaFinalizacion = DateTime.Now;
+                _context.Acuerdos.Update(acuerdo);
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok();
         }
-
 
         private bool MaquinaExists(int id)
         {

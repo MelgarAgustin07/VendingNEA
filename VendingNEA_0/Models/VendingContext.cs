@@ -361,6 +361,10 @@ public partial class VendingContext : DbContext
             entity.Property(e => e.Descripcion).HasMaxLength(100);
             entity.Property(e => e.Marca).HasMaxLength(100);
             entity.Property(e => e.Ubicacion).HasMaxLength(100);
+
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("IsDeleted")
+                .HasDefaultValue(0);
         });
 
         modelBuilder.Entity<MaquinaDebito>(entity =>

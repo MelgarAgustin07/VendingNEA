@@ -66,7 +66,7 @@
                 <a asp-action="Edit" asp-route-id="@item.NumSerie" class="btn btn-warning m-1"><i class="bi bi-pencil-square me-2"></i>Editar</a>   
                 <button type="button"
                         class="btn btn-danger m-1"
-                        onclick="confirmarEliminacion(@item.NumSerie, '@item.Descripcion', '@item.Marca', '@(item.EstadoOperativo == true ? "Operando" : "Fuera de Servicio")')">
+                            onclick="confirmarEliminacion(@item.NumSerie, '@item.Descripcion', '@item.Marca', '@(item.EstadoOperativo == true ? "Operando" : "Fuera de Servicio")','@item.Acuerdos.Any(a => a.FechaFinalizacion >= DateTime.Now).ToString().ToLower()')">
                     <i class="bi bi-trash me-2"></i>Eliminar
                 </button>
             </td>
@@ -79,7 +79,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        function confirmarEliminacion(numSerie, descripcion, marca, estado) {
+        function confirmarEliminacion(numSerie, descripcion, marca, estado, tieneAcuerdo) {
+
+            let advertenciaAcuerdo = "";
+            if (tieneAcuerdo === true || tieneAcuerdo === "true") {
+                advertenciaAcuerdo = `
+                    <br>
+                    <span class="text-danger fw-bold">
+                        ⚠ Esta máquina tiene un acuerdo comercial vigente.<br>
+                        Al eliminarla, el acuerdo será cancelado inmediatamente.
+                    </span>
+                `;
+            }
 
             Swal.fire({
                 title: "¿Eliminar Máquina?",
@@ -89,6 +100,7 @@
                         <strong>Descripción:</strong> ${descripcion}<br>
                         <strong>Marca:</strong> ${marca}<br>
                         <span class="text-danger fw-bold">⚠ Los cambios son irreversibles.</span>
+                        ${advertenciaAcuerdo}
                     </div>
                 `,
                 icon: "warning",

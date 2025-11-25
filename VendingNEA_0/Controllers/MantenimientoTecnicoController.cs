@@ -95,6 +95,7 @@ namespace VendingNEA_0.Controllers
 
             // Máquinas: mostrar "Marca - Descripcion"
             var maquinas = _context.Maquinas
+                .Where(m => !m.IsDeleted)
                 .Select(m => new
                 {
                     m.NumSerie,

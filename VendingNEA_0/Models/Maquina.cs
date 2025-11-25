@@ -19,6 +19,7 @@ public partial class Maquina
 
     [Required(ErrorMessage = "La marca es obligatoria.")]
     public string? Marca { get; set; }
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Acuerdo> Acuerdos { get; set; } = new List<Acuerdo>();
     public virtual ICollection<Almacena> Almacenas { get; set; } = new List<Almacena>();
