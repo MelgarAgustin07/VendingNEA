@@ -22,6 +22,7 @@
 
 <!-- Filtros -->
 <form method="get" class="row g-3 mb-3 align-items-end">
+
     <div class="col-md-4">
         <label class="form-label">Ordenar por</label>
         <select name="orden" class="form-select">
@@ -61,18 +62,27 @@
         </select>
     </div>
 
-    <div class="col-md-4 d-flex justify-content-end gap-2">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-search me-2"></i>Aplicar
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-brush me-2"></i>Limpiar
-        </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>Crear nuevo acuerdo
-        </a>
+    <!-- Botones -->
+    <div class="col-md-4 d-flex align-items-end">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search me-2"></i>Filtrar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-brush me-2"></i>Limpiar
+            </a>
+        </div>
+
+        <div class="ms-auto">
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>Dar de Alta
+            </a>
+        </div>
     </div>
+
 </form>
+
 
 <table class="table table-bordered">
     <thead>

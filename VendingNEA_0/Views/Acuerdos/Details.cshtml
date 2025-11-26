@@ -4,93 +4,114 @@
     ViewData["Title"] = "Detalles del acuerdo";
 }
 
-<h1>Detalles del acuerdo</h1>
-
+<h1 class="text-center mt-4">Detalles del Acuerdo N° @Model.NumAcuerdo</h1>
 <hr />
 
-<div class="card mb-3 p-3">
-    <h4>Información general</h4>
-    <dl class="row mt-2">
-        <dt class="col-sm-3">N° Acuerdo</dt>
-        <dd class="col-sm-9">@Model.NumAcuerdo</dd>
-
-        <dt class="col-sm-3">Fecha inicio</dt>
-        <dd class="col-sm-9">@Model.FechaInicio?.ToShortDateString()</dd>
-
-        <dt class="col-sm-3">Fecha finalización</dt>
-        <dd class="col-sm-9">@Model.FechaFinalizacion?.ToShortDateString()</dd>
-
-        <dt class="col-sm-3">Establecimiento</dt>
-        <dd class="col-sm-9">
-            @Model.CuitNavigation?.NombreComercial (@Model.CuitNavigation?.Cuit)
-        </dd>
-
-        <dt class="col-sm-3">Máquina</dt>
-        <dd class="col-sm-9">
-            N° @Model.NumSerieNavigation?.NumSerie -
-            @Model.NumSerieNavigation?.Descripcion
-            (@Model.NumSerieNavigation?.Marca)
-        </dd>
-    </dl>
+<div class="d-flex justify-content-center mb-4">
+    <a class="btn btn-secondary" asp-action="Index">
+        <i class="bi bi-arrow-left me-2"></i>Volver al listado
+    </a>
 </div>
 
-<hr />
+<div class="row">
 
-<<h4>Condiciones comerciales</h4>
+    <!-- CARD INFORMACIÓN GENERAL -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
 
-@if (Model.CodCondicions != null && Model.CodCondicions.Any())
-{
-    <ul class="list-group mb-3">
-        @foreach (var cond in Model.CodCondicions)
-        {
-            <li class="list-group-item">
-                @* Comisión *@
-                @if (cond.CondicionComision != null)
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Información General</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p><strong>N° Acuerdo:</strong> @Model.NumAcuerdo</p>
+                <p><strong>Fecha inicio:</strong> @Model.FechaInicio?.ToShortDateString()</p>
+                <p><strong>Fecha finalización:</strong> @Model.FechaFinalizacion?.ToShortDateString()</p>
+
+                <hr />
+
+                <p>
+                    <strong>Establecimiento:</strong><br />
+                    @Model.CuitNavigation?.NombreComercial <br />
+                    <small class="text-muted">CUIT: @Model.CuitNavigation?.Cuit</small><br />
+                    <small class="text-muted">@Model.CuitNavigation?.Direccion</small>
+                </p>
+
+                <p class="mt-3">
+                    <strong>Máquina:</strong><br />
+                    N° @Model.NumSerieNavigation?.NumSerie — @Model.NumSerieNavigation?.Descripcion
+                    <br />
+                    <small class="text-muted">
+                        Marca: @Model.NumSerieNavigation?.Marca
+                    </small>
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD CONDICIONES COMERCIALES -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">Condiciones Comerciales</h4>
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.CodCondicions != null && Model.CodCondicions.Any())
                 {
-                    <text>
-                        <strong>Comisión:</strong>
-                        @cond.CondicionComision.Porcentaje %
-                    </text>
+                    <ul class="list-group mb-3">
+                        @foreach (var cond in Model.CodCondicions)
+                        {
+                            <li class="list-group-item">
+
+                                @* Comisión porcentual *@
+                                @if (cond.CondicionComision != null)
+                                {
+                                    <div>
+                                        <strong>Tipo:</strong> Comisión porcentual<br />
+                                        <strong>Porcentaje:</strong> @cond.CondicionComision.Porcentaje %
+                                    </div>
+                                }
+                                @* Monto fijo *@
+                                else if (cond.CondicionMonto != null)
+                                {
+                                    <div>
+                                        <strong>Tipo:</strong> Comisión por monto fijo<br />
+                                        <strong>Monto:</strong> @string.Format("AR$ {0:N2}", cond.CondicionMonto.Monto)
+                                    </div>
+                                }
+                                @* Otros tipos (solo nombre) *@
+                                else
+                                {
+                                    <div>
+                                        <strong>Tipo:</strong> @cond.Nombre
+                                    </div>
+                                }
+
+                            </li>
+                        }
+                    </ul>
                 }
-                @* Monto fijo *@
-                else if (cond.CondicionMonto != null)
-                {
-                    <text>
-                        <strong>Monto fijo:</strong>
-                        @string.Format("AR$ {0:N2}", cond.CondicionMonto.Monto)
-                    </text>
-                }
-                @* Sin detalle *@
                 else
                 {
-                    <text>
-                        <strong>@cond.Nombre</strong>
-                    </text>
+                    <p class="text-muted">No hay condiciones cargadas para este acuerdo.</p>
                 }
-            </li>
-        }
-    </ul>
-}
-else
-{
-    <p>No hay condiciones cargadas para este acuerdo.</p>
-}
 
+                <div class="mt-3">
+                    <a asp-controller="Condicions"
+                       asp-action="Create"
+                       asp-route-numAcuerdo="@Model.NumAcuerdo"
+                       class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar condición
+                    </a>
+                </div>
 
-<div class="mb-3">
-    <a asp-controller="Condicions"
-       asp-action="Create"
-       asp-route-numAcuerdo="@Model.NumAcuerdo"
-       class="btn btn-sm btn-primary">
-        Agregar condición
-    </a>
-</div>
+            </div>
+        </div>
+    </div>
 
-<hr />
-
-<div class="mt-3">
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-2"></i>Volver al listado
-    </a>
 </div>
