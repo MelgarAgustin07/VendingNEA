@@ -1,53 +1,149 @@
 ﻿@model IEnumerable<VendingNEA_0.Models.Acuerdo>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Acuerdos";
+
+    var ordenActual = ViewData["OrdenActual"] as string ?? "";
+    var estadoActual = ViewData["EstadoActual"] as string ?? "";
+    DateTime hoy = DateTime.Today;
 }
 
-<h1>Index</h1>
+<h1>Acuerdos comerciales</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo acuerdo</a>
 </p>
-<table class="table">
+
+<!-- Leyenda de colores -->
+<div class="mb-3">
+    <strong>Leyenda vigencia:</strong>
+    <span class="badge" style="background-color:#d4edda; color:#155724;">Más de 6 meses</span>
+    <span class="badge" style="background-color:#fff3cd; color:#856404;">Entre 1 y 6 meses</span>
+    <span class="badge" style="background-color:#f8d7da; color:#721c24;">Menos de 1 mes</span>
+    <span class="badge bg-secondary">Vencido</span>
+</div>
+
+<!-- Filtros -->
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Ordenar por:</label>
+        <select name="orden" class="form-control">
+            <option value="" selected="@(string.IsNullOrEmpty(ordenActual) ? "selected" : null)">
+                Nº de acuerdo
+            </option>
+            <option value="fechaAsc" selected="@(ordenActual == "fechaAsc" ? "selected" : null)">
+                Fecha fin (más cercanas primero)
+            </option>
+            <option value="fechaDesc" selected="@(ordenActual == "fechaDesc" ? "selected" : null)">
+                Fecha fin (más lejanas primero)
+            </option>
+            <option value="estabAsc" selected="@(ordenActual == "estabAsc" ? "selected" : null)">
+                Establecimiento (A-Z)
+            </option>
+            <option value="estabDesc" selected="@(ordenActual == "estabDesc" ? "selected" : null)">
+                Establecimiento (Z-A)
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Estado de vigencia:</label>
+        <select name="estado" class="form-control">
+            <option value="" selected="@(string.IsNullOrEmpty(estadoActual) ? "selected" : null)">
+                Todos
+            </option>
+            <option value="vigentes" selected="@(estadoActual == "vigentes" ? "selected" : null)">
+                Solo vigentes
+            </option>
+            <option value="porVencer" selected="@(estadoActual == "porVencer" ? "selected" : null)">
+                Próximos a vencer (≤ 1 mes)
+            </option>
+            <option value="vencidos" selected="@(estadoActual == "vencidos" ? "selected" : null)">
+                Vencidos
+            </option>
+        </select>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-success me-2">Aplicar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Quitar filtros</a>
+    </div>
+</form>
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaInicio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaFinalizacion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CuitNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumSerieNavigation)
-            </th>
+            <th>N° Acuerdo</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Establecimiento</th>
+            <th>Máquina</th>
+            <th>Días restantes</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaInicio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaFinalizacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CuitNavigation.Cuit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumSerieNavigation.NumSerie)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NumAcuerdo">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NumAcuerdo">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NumAcuerdo">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            double? diasRestantes = null;
+            if (item.FechaFinalizacion.HasValue)
+            {
+                diasRestantes = (item.FechaFinalizacion.Value.Date - hoy).TotalDays;
+            }
+
+            string claseFila;
+
+            if (!item.FechaFinalizacion.HasValue)
+            {
+                claseFila = "";
+            }
+            else if (item.FechaFinalizacion.Value.Date < hoy)
+            {
+                // Vencido
+                claseFila = "table-secondary";
+            }
+            else if (diasRestantes <= 30)
+            {
+                // Menos de 1 mes
+                claseFila = "table-danger";
+            }
+            else if (diasRestantes <= 180)
+            {
+                // Entre 1 y 6 meses
+                claseFila = "table-warning";
+            }
+            else
+            {
+                // Más de 6 meses
+                claseFila = "table-success";
+            }
+
+            <tr class="@claseFila">
+                <td>@item.NumAcuerdo</td>
+                <td>@(item.FechaInicio?.ToShortDateString())</td>
+                <td>@(item.FechaFinalizacion?.ToShortDateString())</td>
+                <td>@item.CuitNavigation?.NombreComercial</td>
+                <td>@item.NumSerieNavigation?.NumSerie</td>
+                <td>
+                    @if (diasRestantes == null)
+                    {
+                        @:-
+                    }
+                    else if (diasRestantes < 0)
+                    {
+                        @:Vencido
+                    }
+                    else
+                    {
+                        @($"{Math.Floor(diasRestantes.Value)} días")
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.NumAcuerdo">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.NumAcuerdo">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.NumAcuerdo">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

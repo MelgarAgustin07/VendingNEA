@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Crear Acuerdo</h1>
 
 <h4>Acuerdo</h4>
 <hr />
@@ -48,25 +48,39 @@
                 <select asp-for="Cuit" class="form-control" asp-items="ViewBag.Cuit"></select>
             </div>
 
-            @* 🔥 Condiciones comerciales *@
-            @if (ViewBag.Condiciones != null)
-            {
-                <div class="form-group mt-3">
-                    <label>Condiciones comerciales</label>
-                    @foreach (var cond in (IEnumerable<VendingNEA_0.Models.Condicion>)ViewBag.Condiciones)
-                    {
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   name="CondicionesSeleccionadas"
-                                   value="@cond.CodCondicion" />
-                            <label class="form-check-label">
-                                @cond.Nombre
-                            </label>
-                        </div>
-                    }
-                </div>
-            }
+            <hr />
+            <h5>Condición comercial</h5>
+
+            @* Tipo de condición *@
+            <div class="form-group">
+                <label>Tipo de condición</label>
+                <select name="TipoCondicion" id="TipoCondicion" class="form-control">
+                    <option value="">Seleccione...</option>
+                    <option value="comision">Porcentaje (comisión)</option>
+                    <option value="monto">Monto fijo</option>
+                </select>
+            </div>
+
+            @* Porcentaje *@
+            <div class="form-group mt-2" id="divPorcentaje" style="display:none;">
+                <label>Porcentaje (%)</label>
+                <input type="number"
+                       name="Porcentaje"
+                       class="form-control"
+                       step="1"
+                       min="0"
+                       max="100" />
+            </div>
+
+            @* Monto *@
+            <div class="form-group mt-2" id="divMonto" style="display:none;">
+                <label>Monto ($)</label>
+                <input type="number"
+                       name="Monto"
+                       class="form-control"
+                       step="0.01"
+                       min="0" />
+            </div>
 
             <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -80,6 +94,25 @@
 </div>
 
 @section Scripts {
+    <script>
+        const sel = document.getElementById("TipoCondicion");
+        const divP = document.getElementById("divPorcentaje");
+        const divM = document.getElementById("divMonto");
+
+        sel.addEventListener("change", function () {
+            if (this.value === "comision") {
+                divP.style.display = "block";
+                divM.style.display = "none";
+            } else if (this.value === "monto") {
+                divP.style.display = "none";
+                divM.style.display = "block";
+            } else {
+                divP.style.display = "none";
+                divM.style.display = "none";
+            }
+        });
+    </script>
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Crear Condición";
-    var numAcuerdo = ViewBag.NumAcuerdo;   // viene desde Acuerdos/Create
+    var numAcuerdo = ViewBag.NumAcuerdo;   // viene desde Acuerdos/Details
 }
 
 <h1>Crear Condición</h1>
@@ -15,18 +15,17 @@
             <!-- acuerdo al que pertenece -->
             <input type="hidden" name="NumAcuerdo" value="@numAcuerdo" />
 
+            <div class="alert alert-info">
+                Esta condición se asociará al acuerdo N° <strong>@numAcuerdo</strong>.
+            </div>
+
             <!-- resumen de errores -->
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+            <!-- Tipo de condición -->
             <div class="form-group">
-                <label>Nombre de la condición</label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mt-3">
                 <label>Tipo de condición</label>
-                <select id="tipoCondicion" name="TipoCondicion" class="form-control">
+                <select id="TipoCondicion" name="TipoCondicion" class="form-control">
                     <option value="">Seleccione...</option>
                     <option value="comision">Porcentaje (Comisión)</option>
                     <option value="monto">Monto Fijo</option>
@@ -56,6 +55,12 @@
 
             <div class="mt-4">
                 <input type="submit" value="Guardar condición" class="btn btn-primary" />
+                <a asp-controller="Acuerdos"
+                   asp-action="Details"
+                   asp-route-id="@numAcuerdo"
+                   class="btn btn-secondary ms-2">
+                    Volver al acuerdo
+                </a>
             </div>
 
         </form>
@@ -64,13 +69,21 @@
 
 @section Scripts {
     <script>
-        const sel = document.getElementById("tipoCondicion");
+        const sel = document.getElementById("TipoCondicion");
         const divP = document.getElementById("divPorcentaje");
         const divM = document.getElementById("divMonto");
 
         sel.addEventListener("change", function () {
-            divP.style.display = (this.value === "comision") ? "block" : "none";
-            divM.style.display = (this.value === "monto") ? "block" : "none";
+            if (this.value === "comision") {
+                divP.style.display = "block";
+                divM.style.display = "none";
+            } else if (this.value === "monto") {
+                divP.style.display = "none";
+                divM.style.display = "block";
+            } else {
+                divP.style.display = "none";
+                divM.style.display = "none";
+            }
         });
     </script>
 

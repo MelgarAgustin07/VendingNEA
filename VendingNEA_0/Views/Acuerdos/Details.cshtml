@@ -1,43 +1,84 @@
 ﻿@model VendingNEA_0.Models.Acuerdo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del acuerdo";
 }
 
-<h1>Details</h1>
+<h1>Detalles del acuerdo</h1>
 
-<div>
-    <h4>Acuerdo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaInicio)
+<hr />
+
+<div class="card mb-3 p-3">
+    <h4>Información general</h4>
+    <dl class="row mt-2">
+        <dt class="col-sm-3">N° Acuerdo</dt>
+        <dd class="col-sm-9">@Model.NumAcuerdo</dd>
+
+        <dt class="col-sm-3">Fecha inicio</dt>
+        <dd class="col-sm-9">@Model.FechaInicio?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Fecha finalización</dt>
+        <dd class="col-sm-9">@Model.FechaFinalizacion?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Establecimiento</dt>
+        <dd class="col-sm-9">
+            @Model.CuitNavigation?.NombreComercial (@Model.CuitNavigation?.Cuit)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaFinalizacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaFinalizacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CuitNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CuitNavigation.Cuit)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumSerieNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumSerieNavigation.NumSerie)
+
+        <dt class="col-sm-3">Máquina</dt>
+        <dd class="col-sm-9">
+            N° @Model.NumSerieNavigation?.NumSerie -
+            @Model.NumSerieNavigation?.Descripcion
+            (@Model.NumSerieNavigation?.Marca)
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.NumAcuerdo">Edit</a> |
-    <a asp-action="Index">Back to List</a>
 
+<hr />
+
+<h4>Condiciones comerciales</h4>
+
+@if (Model.CodCondicions != null && Model.CodCondicions.Any())
+{
+    <ul class="list-group mb-3">
+        @foreach (var cond in Model.CodCondicions)
+        {
+            <li class="list-group-item">
+                <strong>@cond.Nombre</strong>
+
+                @if (cond.CondicionComision != null)
+                {
+                    <span> - Comisión: @cond.CondicionComision.Porcentaje %</span>
+                }
+                else if (cond.CondicionMonto != null)
+                {
+                    <span> - Monto fijo: $ @cond.CondicionMonto.Monto</span>
+                }
+                else
+                {
+                    <span> - (Sin detalle de comisión / monto)</span>
+                }
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No hay condiciones cargadas para este acuerdo.</p>
+}
+
+<div class="mb-3">
+    <a asp-controller="Condicions"
+       asp-action="Create"
+       asp-route-numAcuerdo="@Model.NumAcuerdo"
+       class="btn btn-sm btn-primary">
+        Agregar condición
+    </a>
+</div>
+
+<hr />
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.NumAcuerdo">Editar</a> |
+    <a asp-action="Index">Volver al listado</a>
 </div>

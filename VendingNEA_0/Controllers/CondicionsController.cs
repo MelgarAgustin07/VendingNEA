@@ -19,7 +19,7 @@ namespace VendingNEA_0.Controllers
 
         // =========================================================
         // GET: Condicions/Create
-        // Se llama con ?numAcuerdo=123 desde AcuerdosController
+        // Se llama con ?numAcuerdo=123 desde Acuerdos/Details
         // =========================================================
         public async Task<IActionResult> Create(int numAcuerdo)
         {
@@ -42,7 +42,7 @@ namespace VendingNEA_0.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("CodCondicion,Nombre")] Condicion condicion,
+            Condicion condicion,
             int NumAcuerdo,
             string TipoCondicion,
             decimal? Porcentaje,
@@ -58,10 +58,7 @@ namespace VendingNEA_0.Controllers
                 ModelState.AddModelError("", "No se encontró el acuerdo asociado.");
             }
 
-            // 2) Validaciones básicas
-            if (string.IsNullOrWhiteSpace(condicion.Nombre))
-                ModelState.AddModelError("Nombre", "El nombre es obligatorio.");
-
+            // 2) Validaciones básicas de tipo
             if (string.IsNullOrWhiteSpace(TipoCondicion))
                 ModelState.AddModelError("", "Debes seleccionar un tipo de condición.");
 
@@ -96,11 +93,21 @@ namespace VendingNEA_0.Controllers
                 return View(condicion);
             }
 
-            // 3) Guardar la condición base
+            // 3) Generar automáticamente el Nombre de la condición
+            if (TipoCondicion == "comision")
+            {
+                condicion.Nombre = $"Comisión {Porcentaje}%";
+            }
+            else if (TipoCondicion == "monto")
+            {
+                condicion.Nombre = $"Monto fijo ${Monto}";
+            }
+
+            // 4) Guardar la condición base
             _context.Condicions.Add(condicion);
             await _context.SaveChangesAsync(); // genera CodCondicion
 
-            // 4) Guardar el detalle según tipo
+            // 5) Guardar el detalle según tipo
             if (TipoCondicion == "comision")
             {
                 var comision = new CondicionComision
@@ -120,17 +127,17 @@ namespace VendingNEA_0.Controllers
                 _context.CondicionMontos.Add(montoFijo);
             }
 
-            // 5) Asociar condición al acuerdo (muchos-a-muchos)
+            // 6) Asociar condición al acuerdo (muchos-a-muchos)
             acuerdo.CodCondicions.Add(condicion);
 
             await _context.SaveChangesAsync();
 
-            // 6) Redirigir: podés seguir agregando más condiciones al mismo acuerdo
-            return RedirectToAction(nameof(Create), new { numAcuerdo = NumAcuerdo });
+            // 7) Volver al detalle del acuerdo
+            return RedirectToAction("Details", "Acuerdos", new { id = NumAcuerdo });
         }
 
         // =========================================================
-        // Opcional: listado simple de condiciones
+        // Listado simple de condiciones (opcional)
         // =========================================================
         public async Task<IActionResult> Index()
         {
@@ -142,9 +149,7 @@ namespace VendingNEA_0.Controllers
             return View(lista);
         }
 
-        // =========================================================
-        // Opcional: detalles de una condición
-        // =========================================================
+        // Detalles de una condición (opcional)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
