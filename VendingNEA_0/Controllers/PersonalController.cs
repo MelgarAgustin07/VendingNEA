@@ -14,9 +14,67 @@ namespace VendingNEA_0.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? fechaDesde, DateTime? fechaHasta, string tipoTarea)
         {
-            return View(await _context.Empleados.ToListAsync());
+            var empleados = await _context.Empleados.ToListAsync();
+
+            var tareas = new List<dynamic>();
+
+            // VISITAS
+            var visitas = await _context.Visita
+                .Include(v => v.LegajoRepositorNavigation)
+                .Select(v => new
+                {
+                    Fecha = v.Fecha,
+                    Empleado = v.LegajoRepositorNavigation.LegajoNavigation.Nombre + " " + v.LegajoRepositorNavigation.LegajoNavigation.Apellido,
+                    Tipo = "Visita",
+                    Descripcion = "Visita a máquina con Nº de serie " + v.NumSerieMaquina
+                })
+                .ToListAsync();
+            tareas.AddRange(visitas);
+
+            // RUTAS
+            var rutas = await _context.Ruta
+                .Include(r => r.LegajoRepositorNavigation)
+                .Select(r => new
+                {
+                    Fecha = r.Fecha,
+                    Empleado = r.LegajoRepositorNavigation.LegajoNavigation.Nombre + " " + r.LegajoRepositorNavigation.LegajoNavigation.Apellido,
+                    Tipo = "Ruta",
+                    Descripcion = "Ruta realizada"
+                })
+                .ToListAsync();
+            tareas.AddRange(rutas);
+
+            // MANTENIMIENTOS
+            var mantenimientos = await _context.Mantenimientos
+                .Include(m => m.LegajoTecnicoNavigation)
+                .Select(m => new
+                {
+                    Fecha = m.Fecha,
+                    Empleado = m.LegajoTecnicoNavigation.LegajoNavigation.Nombre + " " + m.LegajoTecnicoNavigation.LegajoNavigation.Apellido,
+                    Tipo = "Mantenimiento",
+                    Descripcion = m.Tipo + " en máquina con Nº de serie " + m.NumSerieMaquina
+                })
+                .ToListAsync();
+            tareas.AddRange(mantenimientos);
+
+            if (fechaDesde != null)
+                tareas = tareas.Where(t => t.Fecha.Date >= fechaDesde.Value.Date).ToList();
+
+            if (fechaHasta != null)
+                tareas = tareas.Where(t => t.Fecha.Date <= fechaHasta.Value.Date).ToList();
+
+            if (!string.IsNullOrEmpty(tipoTarea) && tipoTarea != "Todos")
+                tareas = tareas.Where(t => t.Tipo == tipoTarea).ToList();
+
+            ViewBag.Historial = tareas.OrderByDescending(t => t.Fecha).ToList();
+
+            ViewBag.FechaDesde = fechaDesde?.ToString("yyyy-MM-dd");
+            ViewBag.FechaHasta = fechaHasta?.ToString("yyyy-MM-dd");
+            ViewBag.TipoTarea = tipoTarea ?? "Todos";
+
+            return View(empleados);
         }
 
         public IActionResult Create()
