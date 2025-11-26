@@ -36,7 +36,7 @@
 
 <hr />
 
-<h4>Condiciones comerciales</h4>
+<<h4>Condiciones comerciales</h4>
 
 @if (Model.CodCondicions != null && Model.CodCondicions.Any())
 {
@@ -44,19 +44,28 @@
         @foreach (var cond in Model.CodCondicions)
         {
             <li class="list-group-item">
-                <strong>@cond.Nombre</strong>
-
+                @* Comisión *@
                 @if (cond.CondicionComision != null)
                 {
-                    <span> - Comisión: @cond.CondicionComision.Porcentaje %</span>
+                    <text>
+                        <strong>Comisión:</strong>
+                        @cond.CondicionComision.Porcentaje %
+                    </text>
                 }
+                @* Monto fijo *@
                 else if (cond.CondicionMonto != null)
                 {
-                    <span> - Monto fijo: $ @cond.CondicionMonto.Monto</span>
+                    <text>
+                        <strong>Monto fijo:</strong>
+                        @string.Format("AR$ {0:N2}", cond.CondicionMonto.Monto)
+                    </text>
                 }
+                @* Sin detalle *@
                 else
                 {
-                    <span> - (Sin detalle de comisión / monto)</span>
+                    <text>
+                        <strong>@cond.Nombre</strong>
+                    </text>
                 }
             </li>
         }
@@ -66,6 +75,7 @@ else
 {
     <p>No hay condiciones cargadas para este acuerdo.</p>
 }
+
 
 <div class="mb-3">
     <a asp-controller="Condicions"
@@ -78,7 +88,9 @@ else
 
 <hr />
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.NumAcuerdo">Editar</a> |
-    <a asp-action="Index">Volver al listado</a>
+<div class="mt-3">
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-2"></i>Volver al listado
+    </a>
 </div>

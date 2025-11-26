@@ -1,18 +1,15 @@
 ﻿@model IEnumerable<VendingNEA_0.Models.Acuerdo>
 
 @{
-    ViewData["Title"] = "Acuerdos";
+    ViewData["Title"] = "Gestión de Acuerdos Comerciales";
 
     var ordenActual = ViewData["OrdenActual"] as string ?? "";
     var estadoActual = ViewData["EstadoActual"] as string ?? "";
     DateTime hoy = DateTime.Today;
 }
 
-<h1>Acuerdos comerciales</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Crear nuevo acuerdo</a>
-</p>
+<h1 class="text-center mt-4">Gestión de Acuerdos Comerciales</h1>
+<hr />
 
 <!-- Leyenda de colores -->
 <div class="mb-3">
@@ -24,62 +21,69 @@
 </div>
 
 <!-- Filtros -->
-<form method="get" class="row g-2 mb-3">
+<form method="get" class="row g-3 mb-3 align-items-end">
     <div class="col-md-4">
-        <label class="form-label">Ordenar por:</label>
-        <select name="orden" class="form-control">
-            <option value="" selected="@(string.IsNullOrEmpty(ordenActual) ? "selected" : null)">
+        <label class="form-label">Ordenar por</label>
+        <select name="orden" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(ordenActual))">
                 Nº de acuerdo
             </option>
-            <option value="fechaAsc" selected="@(ordenActual == "fechaAsc" ? "selected" : null)">
+            <option value="fechaAsc" selected="@(ordenActual == "fechaAsc")">
                 Fecha fin (más cercanas primero)
             </option>
-            <option value="fechaDesc" selected="@(ordenActual == "fechaDesc" ? "selected" : null)">
+            <option value="fechaDesc" selected="@(ordenActual == "fechaDesc")">
                 Fecha fin (más lejanas primero)
             </option>
-            <option value="estabAsc" selected="@(ordenActual == "estabAsc" ? "selected" : null)">
+            <option value="estabAsc" selected="@(ordenActual == "estabAsc")">
                 Establecimiento (A-Z)
             </option>
-            <option value="estabDesc" selected="@(ordenActual == "estabDesc" ? "selected" : null)">
+            <option value="estabDesc" selected="@(ordenActual == "estabDesc")">
                 Establecimiento (Z-A)
             </option>
         </select>
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">Estado de vigencia:</label>
-        <select name="estado" class="form-control">
-            <option value="" selected="@(string.IsNullOrEmpty(estadoActual) ? "selected" : null)">
+        <label class="form-label">Estado de vigencia</label>
+        <select name="estado" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(estadoActual))">
                 Todos
             </option>
-            <option value="vigentes" selected="@(estadoActual == "vigentes" ? "selected" : null)">
+            <option value="vigentes" selected="@(estadoActual == "vigentes")">
                 Solo vigentes
             </option>
-            <option value="porVencer" selected="@(estadoActual == "porVencer" ? "selected" : null)">
+            <option value="porVencer" selected="@(estadoActual == "porVencer")">
                 Próximos a vencer (≤ 1 mes)
             </option>
-            <option value="vencidos" selected="@(estadoActual == "vencidos" ? "selected" : null)">
+            <option value="vencidos" selected="@(estadoActual == "vencidos")">
                 Vencidos
             </option>
         </select>
     </div>
 
-    <div class="col-md-4 d-flex align-items-end">
-        <button type="submit" class="btn btn-success me-2">Aplicar</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Quitar filtros</a>
+    <div class="col-md-4 d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search me-2"></i>Aplicar
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-brush me-2"></i>Limpiar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Crear nuevo acuerdo
+        </a>
     </div>
 </form>
 
-<table class="table table-striped">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>N° Acuerdo</th>
-            <th>Inicio</th>
-            <th>Fin</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
             <th>Establecimiento</th>
             <th>Máquina</th>
             <th>Días restantes</th>
-            <th></th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -99,29 +103,25 @@
             }
             else if (item.FechaFinalizacion.Value.Date < hoy)
             {
-                // Vencido
-                claseFila = "table-secondary";
+                claseFila = "table-secondary";          // vencido
             }
             else if (diasRestantes <= 30)
             {
-                // Menos de 1 mes
-                claseFila = "table-danger";
+                claseFila = "table-danger";             // < 1 mes
             }
             else if (diasRestantes <= 180)
             {
-                // Entre 1 y 6 meses
-                claseFila = "table-warning";
+                claseFila = "table-warning";            // 1–6 meses
             }
             else
             {
-                // Más de 6 meses
-                claseFila = "table-success";
+                claseFila = "table-success";            // > 6 meses
             }
 
             <tr class="@claseFila">
                 <td>@item.NumAcuerdo</td>
-                <td>@(item.FechaInicio?.ToShortDateString())</td>
-                <td>@(item.FechaFinalizacion?.ToShortDateString())</td>
+                <td>@item.FechaInicio?.ToShortDateString()</td>
+                <td>@item.FechaFinalizacion?.ToShortDateString()</td>
                 <td>@item.CuitNavigation?.NombreComercial</td>
                 <td>@item.NumSerieNavigation?.NumSerie</td>
                 <td>
@@ -139,9 +139,11 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.NumAcuerdo">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.NumAcuerdo">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.NumAcuerdo">Delete</a>
+                    <a asp-action="Details"
+                       asp-route-id="@item.NumAcuerdo"
+                       class="btn btn-primary m-1">
+                        <i class="bi bi-clipboard-check me-2"></i>Ver Acuerdo
+                    </a>
                 </td>
             </tr>
         }
